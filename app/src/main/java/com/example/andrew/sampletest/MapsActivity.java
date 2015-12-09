@@ -14,6 +14,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -24,6 +26,11 @@ import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListe
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements
         OnMapReadyCallback, ConnectionCallbacks, OnConnectionFailedListener {
@@ -35,6 +42,8 @@ public class MapsActivity extends FragmentActivity implements
     protected String mLongitudeLabel;
     protected TextView mLatitudeText;
     protected TextView mLongitudeText;
+    protected int markerIndex = 0;
+    protected List<LatLng> markerList = new ArrayList<LatLng>();
     private GoogleMap mMap;
 
     @Override
@@ -60,20 +69,51 @@ public class MapsActivity extends FragmentActivity implements
                 double lat = mLastLocation.getLatitude();
                 double lng = mLastLocation.getLongitude();
                 LatLng latlng = new LatLng(lat, lng);
-                mMap.addMarker(new MarkerOptions().position(latlng).title("Location"));
+                //mMap.addMarker(new MarkerOptions().position(latlng).title("Location"));
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng, 16));
-                Polygon polygon = mMap.addPolygon(new PolygonOptions()
-                        .add(   new LatLng(lat - .001, lng - .001),
-                                new LatLng(lat - .001, lng + .00075),
-                                new LatLng(lat, lng + .0015),
-                                new LatLng(lat + .001, lng + .00075),
-                                new LatLng(lat + .001, lng - .001))
+                Circle storrs = mMap.addCircle(new CircleOptions()
+                        .center(new LatLng(41.8193203,-72.2511833))
+                        .radius(2500)
                         .strokeColor(Color.BLUE)
-                        .fillColor(Color.CYAN));
+                        .fillColor(0x7700B4D2));
+//                Polygon polygon = mMap.addPolygon(new PolygonOptions()
+//                        .add(   new LatLng(lat - .001, lng - .001),
+//                                new LatLng(lat - .001, lng + .00075),
+//                                new LatLng(lat, lng + .0015),
+//                                new LatLng(lat + .001, lng + .00075),
+//                                new LatLng(lat + .001, lng - .001))
+//                        .strokeColor(Color.BLUE)
+//                        .fillColor(0x7700B4D2));
             }
         });
-        // add a button to put a marker at your location and connect it to previous marker
+
+        Button clearButton = (Button) findViewById(R.id.button_clear);
+        clearButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                mMap.clear();
+            }
+        });
+
+        Button locationMarker = (Button) findViewById(R.id.button_current_location);
+        locationMarker.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+                double lat = mLastLocation.getLatitude();
+                double lng = mLastLocation.getLongitude();
+                LatLng latlng = new LatLng(lat, lng);
+                markerList.add(latlng);
+                if(markerList.size() > 1)
+                {
+                    Polyline polyline = mMap.addPolyline(new PolylineOptions()
+                            .add(markerList.get(markerIndex - 1), markerList.get(markerIndex))
+                            .color(Color.RED));
+                }
+                mMap.addMarker(new MarkerOptions().position(latlng).title("Marker" + markerIndex));
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
+                markerIndex++;
+            }
+        });
     }
 
     @Override
@@ -105,10 +145,12 @@ public class MapsActivity extends FragmentActivity implements
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-//        LatLng sydney = new LatLng(-34, 151);
-//        mMap.addMarker(new MarkerOptions().position(sydney).title("Sydney"));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        //LatLng sydney = new LatLng(-34, 151);
+        //mMap.addMarker(new MarkerOptions().position(sydney).title("Sydney"));
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+
         mMap.setMyLocationEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
 
     }
 

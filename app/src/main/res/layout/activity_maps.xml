@@ -5,7 +5,8 @@
     android:name="com.google.android.gms.maps.SupportMapFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.andrew.sampletest.MapsActivity">
+    tools:context="com.example.andrew.sampletest.MapsActivity"
+    tools:layout="@layout/activity_maps">
 
     <Button
         android:id="@+id/button_find_location"
@@ -13,6 +14,22 @@
         android:layout_height="wrap_content"
         android:layout_gravity="start|top"
         android:text="Find Location"
+        android:padding="10dp"/>
+
+    <Button
+        android:id="@+id/button_clear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|top"
+        android:text="Clear Overlay"
+        android:padding="10dp"/>
+
+    <Button
+        android:id="@+id/button_current_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:text="Add marker"
         android:padding="10dp"/>
 
 </fragment>

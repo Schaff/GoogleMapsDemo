@@ -73,6 +73,7 @@ public class MapsActivity extends FragmentActivity implements
                         .fillColor(Color.CYAN));
             }
         });
+        // add a button to put a marker at your location and connect it to previous marker
     }
 
     @Override
